@@ -1,17 +1,18 @@
 ---
-# If airgapped, all K3s artifacts are already on the node.
 - name: Download K3s install script
-  when: airgap_dir is undefined
+  when: air_gap is false
+  become: true
   ansible.builtin.get_url:
     url: https://get.k3s.io/
     timeout: 120
     dest: /usr/local/bin/k3s-install.sh
     owner: root
     group: root
-    mode: 0755
+    mode: "0755"
 
 - name: Download K3s binary
-  when: airgap_dir is undefined
+  when: air_gap is false
+  become: true
   ansible.builtin.command:
     cmd: /usr/local/bin/k3s-install.sh
   environment:
@@ -31,16 +32,17 @@
     - name: Make config directory
       ansible.builtin.file:
         path: "/etc/rancher/k3s"
-        mode: 0755
+        mode: "0755"
         state: directory
     - name: Copy config values
       ansible.builtin.copy:
         content: "{{ server_config_yaml }}"
         dest: "/etc/rancher/k3s/config.yaml"
-        mode: 0644
+        mode: "0644"
 
 - name: Init first server node
   when: inventory_hostname == groups['server'][0]
+  become: true
   block:
     - name: Copy K3s service file [Single]
       when: groups['server'] | length == 1
@@ -49,7 +51,7 @@
         dest: "{{ systemd_dir }}/k3s.service"
         owner: root
         group: root
-        mode: 0644
+        mode: "0644"
 
     - name: Copy K3s service file [HA]
       when: groups['server'] | length > 1
@@ -58,7 +60,7 @@
         dest: "{{ systemd_dir }}/k3s.service"
         owner: root
         group: root
-        mode: 0644
+        mode: "0644"
 
     - name: Add service environment variables
       when: extra_service_envs is defined
@@ -83,7 +85,7 @@
       ansible.builtin.command: 'kubectl'
       register: kubectl_installed
       ignore_errors: true
-      delegate_to: 127.0.0.1
+      delegate_to: localhost
       become: false
       changed_when: false
 
@@ -99,7 +101,7 @@
         - name: Change server address in kubeconfig on control node
           ansible.builtin.shell: |
             KUBECONFIG={{ kubeconfig }} kubectl config set-cluster default --server=https://{{ api_endpoint }}:{{ api_port }}
-          delegate_to: 127.0.0.1
+          delegate_to: localhost
           become: false
           register: csa_result
           changed_when:
@@ -111,7 +113,7 @@
             path: "{{ kubeconfig }}"
             regexp: 'name: default'
             replace: 'name: k3s-ansible'
-          delegate_to: 127.0.0.1
+          delegate_to: localhost
           become: false
 
         - name: Merge with any existing kubeconfig on control node
@@ -122,7 +124,7 @@
             KUBECONFIG={{ kubeconfig }}:~/.kube/config kubectl config view --flatten > ${TFILE}
             mv ${TFILE} ~/.kube/config
             rm {{ kubeconfig }}
-          delegate_to: 127.0.0.1
+          delegate_to: localhost
           become: false
           register: mv_result
           changed_when:
@@ -132,6 +134,7 @@
   when:
     - (groups['server'] | length) > 1
     - inventory_hostname != groups['server'][0]
+  become: true
   block:
     - name: Copy K3s service file [HA]
       when: groups['server'] | length > 1
@@ -140,7 +143,7 @@
         dest: "{{ systemd_dir }}/k3s.service"
         owner: root
         group: root
-        mode: 0644
+        mode: "0644"
 
     - name: Enable and check K3s service
       ansible.builtin.systemd:
@@ -163,7 +166,6 @@
 - name: Setup kubectl for user
   when: user_kubectl
   block:
-
     - name: Create kubectl symlink
       when: lookup('fileglob', '/usr/local/bin/kubectl', errors='warn') | length == 0
       ansible.builtin.file:
@@ -184,7 +186,8 @@
         dest: ~{{ ansible_user }}/.kube/config
         remote_src: true
         owner: "{{ ansible_user }}"
-        mode: "u=rw,g=,o="
+        mode: "0755"
+      become: true
 
     - name: Configure default KUBECONFIG for user
       ansible.builtin.lineinfile:

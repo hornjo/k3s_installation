@@ -1,0 +1,10 @@
+---
+- name: Preparation of node
+  ansible.builtin.include_tasks: host-prep.yml
+
+- name: Installation in air_gap environment
+  ansible.builtin.include_tasks: airgap-prep.yml
+  when: air_gap is true
+
+- name: Installation in online environment
+  ansible.builtin.include_tasks: installation.yml

@@ -1,0 +1,13 @@
+---
+api_port: 6443
+api_endpoint: "{{ hostvars[groups['server'][0]]['ansible_host'] | default(groups['server'][0]) }}"
+cidr: 192.168.0.0/16
+air_gap: false
+k3s_version: v1.26.9+k3s1
+user_kubectl: true
+k3s_server_location: "/var/lib/rancher/k3s"
+systemd_dir: "/etc/systemd/system"
+kubeconfig: "~/.kube/config-k3s-{{ hostvars[groups['server'][0]]['ansible_host'] | default(groups['server'][0]) }}"
+token: "mytoken" # Please change this value
+extra_server_args: ""
+extra_agent_args: ""
