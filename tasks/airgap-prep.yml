@@ -24,6 +24,7 @@
     owner: root
     group: root
     mode: "0755"
+  become: true
 
 - name: Distribute K3s binary
   ansible.builtin.copy:
@@ -32,6 +33,7 @@
     owner: root
     group: root
     mode: "0755"
+  become: true
 
 - name: Distribute K3s SELinux RPM
   ansible.builtin.copy:
@@ -44,6 +46,7 @@
     - "{{ airgap_dir }}/k3s-selinux*.rpm"
   register: selinux_copy
   ignore_errors: true
+  become: true
 
 - name: Install K3s SELinux RPM
   when:
@@ -53,6 +56,7 @@
     name: "{{ selinux_copy.results[0].dest }}"
     state: present
     disable_gpg_check: true
+  become: true
 
 - name: Make images directory
   ansible.builtin.file:
@@ -78,6 +82,7 @@
         - "{{ airgap_dir }}/k3s-airgap-images-amd64.tar.gz"
         - "{{ airgap_dir }}/k3s-airgap-images-amd64.tar"
       skip: true
+  become: true
 
 - name: Distribute K3s arm64 images
   when: ansible_architecture == 'aarch64'
@@ -93,6 +98,7 @@
         - "{{ airgap_dir }}/k3s-airgap-images-arm64.tar.gz"
         - "{{ airgap_dir }}/k3s-airgap-images-arm64.tar"
       skip: true
+  become: true
 
 - name: Distribute K3s arm images
   when: ansible_architecture == 'armv7l'
@@ -108,6 +114,7 @@
         - "{{ airgap_dir }}/k3s-airgap-images-arm.tar.gz"
         - "{{ airgap_dir }}/k3s-airgap-images-arm.tar"
       skip: true
+  become: true
 
 - name: Run K3s Install [server]
   ansible.builtin.command:
@@ -116,6 +123,7 @@
     INSTALL_K3S_SKIP_START: "true"
     INSTALL_K3S_SKIP_DOWNLOAD: "true"
   changed_when: true
+  become: true
 
 - name: Run K3s Install [agent]
   ansible.builtin.command:
@@ -125,3 +133,4 @@
     INSTALL_K3S_SKIP_DOWNLOAD: "true"
     INSTALL_K3S_EXEC: "agent"
   changed_when: true
+  become: true
