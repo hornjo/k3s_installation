@@ -2,7 +2,7 @@
 - name: Set airgap directory
   ansible.builtin.set_fact:
     airgap_dir: "../files"
-  when: airgap_dir is not defined
+  when: k3s_installation_airgap_dir is not defined
 
 - name: Verify Ansible meets airgap version requirements.
   ansible.builtin.assert:
@@ -14,12 +14,12 @@
   ansible.builtin.get_url:
     url: https://get.k3s.io/
     timeout: 120
-    dest: "{{ airgap_dir }}/k3s-install.sh"
+    dest: "{{ k3s_installation_airgap_dir }}/k3s-install.sh"
     mode: "0755"
 
 - name: Distribute K3s install script
   ansible.builtin.copy:
-    src: "{{ airgap_dir }}/k3s-install.sh"
+    src: "{{ k3s_installation_airgap_dir }}/k3s-install.sh"
     dest: /usr/local/bin/k3s-install.sh
     owner: root
     group: root
@@ -28,7 +28,7 @@
 
 - name: Distribute K3s binary
   ansible.builtin.copy:
-    src: "{{ airgap_dir }}/k3s"
+    src: "{{ k3s_installation_airgap_dir }}/k3s"
     dest: /usr/local/bin/k3s
     owner: root
     group: root
@@ -43,20 +43,20 @@
     group: root
     mode: "0755"
   with_fileglob:
-    - "{{ airgap_dir }}/k3s-selinux*.rpm"
+    - "{{ k3s_installation_airgap_dir }}/k3s-selinux*.rpm"
   register: selinux_copy
   ignore_errors: true
   become: true
 
 - name: Install K3s SELinux RPM
-  when:
-    - ansible_os_family == 'RedHat'
-    - selinux_copy.skipped is false
   ansible.builtin.yum:
     name: "{{ selinux_copy.results[0].dest }}"
     state: present
     disable_gpg_check: true
   become: true
+  when:
+    - ansible_os_family == 'RedHat'
+    - selinux_copy.skipped is false
 
 - name: Make images directory
   ansible.builtin.file:
@@ -78,9 +78,9 @@
     mode: "0755"
   with_first_found:
     - files:
-        - "{{ airgap_dir }}/k3s-airgap-images-amd64.tar.zst"
-        - "{{ airgap_dir }}/k3s-airgap-images-amd64.tar.gz"
-        - "{{ airgap_dir }}/k3s-airgap-images-amd64.tar"
+        - "{{ k3s_installation_airgap_dir }}/k3s-airgap-images-amd64.tar.zst"
+        - "{{ k3s_installation_airgap_dir }}/k3s-airgap-images-amd64.tar.gz"
+        - "{{ k3s_installation_airgap_dir }}/k3s-airgap-images-amd64.tar"
       skip: true
   become: true
 
@@ -94,9 +94,9 @@
     mode: "0755"
   with_first_found:
     - files:
-        - "{{ airgap_dir }}/k3s-airgap-images-arm64.tar.zst"
-        - "{{ airgap_dir }}/k3s-airgap-images-arm64.tar.gz"
-        - "{{ airgap_dir }}/k3s-airgap-images-arm64.tar"
+        - "{{ k3s_installation_airgap_dir }}/k3s-airgap-images-arm64.tar.zst"
+        - "{{ k3s_installation_airgap_dir }}/k3s-airgap-images-arm64.tar.gz"
+        - "{{ k3s_installation_airgap_dir }}/k3s-airgap-images-arm64.tar"
       skip: true
   become: true
 
@@ -110,9 +110,9 @@
     mode: "0755"
   with_first_found:
     - files:
-        - "{{ airgap_dir }}/k3s-airgap-images-arm.tar.zst"
-        - "{{ airgap_dir }}/k3s-airgap-images-arm.tar.gz"
-        - "{{ airgap_dir }}/k3s-airgap-images-arm.tar"
+        - "{{ k3s_installation_airgap_dir }}/k3s-airgap-images-arm.tar.zst"
+        - "{{ k3s_installation_airgap_dir }}/k3s-airgap-images-arm.tar.gz"
+        - "{{ k3s_installation_airgap_dir }}/k3s-airgap-images-arm.tar"
       skip: true
   become: true
 

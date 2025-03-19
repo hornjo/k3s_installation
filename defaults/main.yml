@@ -1,13 +1,14 @@
 ---
-api_port: 6443
-api_endpoint: "{{ hostvars[groups['server'][0]]['ansible_host'] | default(groups['server'][0]) }}"
-cidr: 192.168.0.0/16
-air_gap: false
-k3s_version: v1.26.9+k3s1
-user_kubectl: true
-k3s_server_location: "/var/lib/rancher/k3s"
-systemd_dir: "/etc/systemd/system"
-kubeconfig: "~/.kube/config-k3s-{{ hostvars[groups['server'][0]]['ansible_host'] | default(groups['server'][0]) }}"
-token: "mytoken" # Please change this value
-extra_server_args: ""
-extra_agent_args: ""
+k3s_installation_api_port: 6443
+k3s_installation_api_endpoint: "{{ hostvars[groups['server'][0]]['ansible_host'] | default(groups['server'][0]) }}"
+k3s_installation_lb_ip: ""
+k3s_installation_cidr: 192.168.0.0/16
+k3s_installation_air_gap: false
+k3s_installation_k3s_version: v1.32.2+k3s1
+k3s_installation_user_kubectl: true
+k3s_installation_k3s_server_location: "/var/lib/rancher/k3s"
+k3s_installation_systemd_dir: "/etc/systemd/system"
+k3s_installation_kubeconfig: "~/.kube/configs/config-k3s-{{ hostvars[groups['server'][0]]['ansible_host'] | default(groups['server'][0]) }}"
+k3s_installation_token: "myToken" # Please change this value
+k3s_installation_extra_server_args: ""
+k3s_installation_extra_agent_args: ""

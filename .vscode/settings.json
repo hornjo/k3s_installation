@@ -1,0 +1,12 @@
+{
+    "cSpell.words": [
+        "airgap",
+        "Archlinux",
+        "firewalld",
+        "hostvars",
+        "insertafter",
+        "kubeconfig",
+        "lineinfile",
+        "netfilter"
+    ]
+}

@@ -4,7 +4,12 @@
 
 - name: Installation in air_gap environment
   ansible.builtin.include_tasks: airgap-prep.yml
-  when: air_gap is true
+  when: k3s_installation_air_gap is true
 
-- name: Installation in online environment
-  ansible.builtin.include_tasks: installation.yml
+- name: Installation in online environment for server
+  ansible.builtin.include_tasks: installation-server.yml
+  when: inventory_hostname in groups['server']
+
+- name: Installation in online environment for agent
+  ansible.builtin.include_tasks: installation-agent.yml
+  when: inventory_hostname in groups['agent']

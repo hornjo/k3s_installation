@@ -11,7 +11,7 @@ WantedBy=multi-user.target
 Type=notify
 EnvironmentFile=-/etc/default/%N
 EnvironmentFile=-/etc/sysconfig/%N
-EnvironmentFile=-/etc/systemd/system/k3s.service.env
+EnvironmentFile=-/etc/systemd/system/k3s-agent.service.env
 KillMode=process
 Delegate=yes
 # Having non-zero Limit*s causes performance problems due to accounting overhead
@@ -23,6 +23,7 @@ TasksMax=infinity
 TimeoutStartSec=0
 Restart=always
 RestartSec=5s
+ExecStartPre=/bin/sh -xc '! /usr/bin/systemctl is-enabled --quiet nm-cloud-setup.service'
 ExecStartPre=-/sbin/modprobe br_netfilter
 ExecStartPre=-/sbin/modprobe overlay
-ExecStart=/usr/local/bin/k3s server --data-dir {{ k3s_installation_k3s_server_location }} --token {{ k3s_installation_token }} {{ k3s_installation_extra_server_args }} 
+ExecStart=/usr/local/bin/k3s agent --data-dir {{ k3s_installation_k3s_server_location }} --server https://{{ k3s_installation_api_endpoint }}:{{ k3s_installation_api_port }} {{ k3s_installation_extra_agent_args }}
