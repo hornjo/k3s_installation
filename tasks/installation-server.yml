@@ -153,7 +153,7 @@
         enabled: true
 
     - name: Verify that all server nodes joined
-      when: (groups['server'] | length) > 1
+      when: (groups['server'] | length) > 1 && not ansible_check_mode
       ansible.builtin.command:
         cmd: >
           k3s kubectl get nodes -l "node-role.kubernetes.io/control-plane=true" -o=jsonpath="{.items[*].metadata.name}"
@@ -164,7 +164,7 @@
       changed_when: false
 
 - name: Setup kubectl for user
-  when: k3s_installation_user_kubectl
+  when: k3s_installation_user_kubectl && not ansible_check_mode
   block:
     - name: Create kubectl symlink
       when: lookup('fileglob', '/usr/local/bin/kubectl', errors='warn') | length == 0
