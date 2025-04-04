@@ -3,7 +3,6 @@ k3s_installation_api_port: 6443
 k3s_installation_api_endpoint: "{{ hostvars[groups['server'][0]]['ansible_host'] | default(groups['server'][0]) }}"
 k3s_installation_lb_ip: ""
 k3s_installation_cidr: 192.168.0.0/16
-k3s_installation_air_gap: false
 k3s_installation_k3s_version: v1.32.2+k3s1
 k3s_installation_user_kubectl: true
 k3s_installation_k3s_server_location: "/var/lib/rancher/k3s"

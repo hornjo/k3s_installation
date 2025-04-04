@@ -1,11 +1,4 @@
 ---
-- name: Install Dependent Ubuntu Packages
-  when: ansible_distribution in ['Ubuntu']
-  ansible.builtin.apt:
-    name: policycoreutils # Used by install script to restore SELinux context
-    update_cache: true
-  become: true
-
 - name: Enable IPv4 forwarding
   ansible.posix.sysctl:
     name: net.ipv4.ip_forward
@@ -22,9 +15,6 @@
     reload: true
   become: true
   when: ansible_all_ipv6_addresses
-
-- name: Populate service facts
-  ansible.builtin.service_facts:
 
 - name: Add br_netfilter to /etc/modules-load.d/
   ansible.builtin.copy:

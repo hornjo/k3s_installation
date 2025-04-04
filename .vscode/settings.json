@@ -3,10 +3,12 @@
         "airgap",
         "Archlinux",
         "firewalld",
+        "hornjo",
         "hostvars",
         "insertafter",
         "kubeconfig",
         "lineinfile",
-        "netfilter"
+        "netfilter",
+        "traefik"
     ]
 }
