@@ -38,6 +38,23 @@
         dest: "/etc/rancher/k3s/config.yaml"
         mode: "0644"
 
+- name: Setup optional registry mirrors
+  when: k3s_installation_registry_mirrors is defined and (k3s_installation_registry_mirrors | length > 0)
+  block:
+    - name: Make config directory
+      ansible.builtin.file:
+        path: "/etc/rancher/k3s"
+        mode: "0755"
+        state: directory
+
+    - name: Add custom registry template
+      ansible.builtin.template:
+        src: "k3s-registries.yaml.j2"
+        dest: "/etc/rancher/k3s/registries.yaml"
+        owner: root
+        group: root
+        mode: "0644"
+
 - name: Init first server node
   when: inventory_hostname == groups['server'][0]
   become: true
