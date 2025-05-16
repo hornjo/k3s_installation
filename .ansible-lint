@@ -1,4 +1,0 @@
----
-warn_list:
-  - yaml[comments-indentation]
-  - yaml[line-length]
