@@ -52,6 +52,24 @@
     - "K3S_TOKEN={{ k3s_installation_token }}"
   ignore_errors: "{{ ansible_check_mode }}"
 
+- name: Setup optional registry mirrors
+  when: k3s_installation_registry_mirrors is defined and (k3s_installation_registry_mirrors | length > 0)
+  block:
+    - name: Make config directory
+      ansible.builtin.file:
+        path: "/etc/rancher/k3s"
+        mode: "0755"
+        state: directory
+
+    - name: Add custom registry template
+      ansible.builtin.template:
+        src: "k3s-registries.yaml.j2"
+        dest: "/etc/rancher/k3s/registries.yaml"
+        owner: root
+        group: root
+        mode: "0644"
+      notify: Restart k3s agent
+
 - name: Copy K3s service file
   register: k3s_agent_service
   become: true

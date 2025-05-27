@@ -54,6 +54,7 @@
         owner: root
         group: root
         mode: "0644"
+      notify: Restart k3s server
 
 - name: Init first server node
   when: inventory_hostname == groups['server'][0]
